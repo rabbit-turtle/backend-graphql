@@ -1,0 +1,95 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String    @id @default(cuid())
+  name        String    @db.VarChar(100)
+  profile_url String    @db.VarChar(1500)
+  social_id   String    @unique @db.VarChar(300)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
+
+  chats          Chat[]
+  chat_imags     ChatImage[]
+  rooms_invited  Room[]      @relation("Room_inviterToUser")
+  rooms_received Room[]      @relation("Room_receiverToUser")
+
+  social_type    SocialLoginType @relation(fields: [social_type_id], references: [id])
+  social_type_id Int
+
+  @@map(name: "users")
+}
+
+model SocialLoginType {
+  id   Int    @id @default(autoincrement())
+  name String @db.Char(20)
+
+  users User[]
+
+  @@map(name: "social_login_types")
+}
+
+model Chat {
+  id         String   @id @default(uuid())
+  content    String   @db.VarChar(2000)
+  created_at DateTime @default(now())
+
+  sender    User   @relation(fields: [sender_id], references: [id])
+  sender_id String
+  room      Room   @relation(fields: [room_id], references: [id])
+  room_id   String
+
+  @@map(name: "chats")
+}
+
+model ChatImage {
+  id         String   @id @default(uuid())
+  url        String   @db.VarChar(1500)
+  created_at DateTime @default(now())
+
+  sender    User   @relation(fields: [sender_id], references: [id])
+  sender_id String
+  room      Room   @relation(fields: [room_id], references: [id])
+  room_id   String
+
+  @@map(name: "chat_images")
+}
+
+model Room {
+  id             String    @id @default(uuid())
+  title          String    @db.VarChar(100)
+  location       Json?     @db.Json
+  reserved_time  DateTime?
+  completed_time DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime? @updatedAt
+  deleted_at     DateTime?
+
+  chats       Chat[]
+  chat_images ChatImage[]
+
+  room_status    RoomStatus @relation(fields: [room_status_id], references: [id])
+  room_status_id Int
+  inviter        User       @relation("Room_inviterToUser", fields: [inviter_id], references: [id])
+  inviter_id     String
+  receiver       User       @relation("Room_receiverToUser", fields: [receiver_id], references: [id])
+  receiver_id    String
+
+  @@map(name: "rooms")
+}
+
+model RoomStatus {
+  id   Int    @id @default(autoincrement())
+  name String @db.Char(20)
+
+  rooms Room[]
+
+  @@map(name: "room_status")
+}
