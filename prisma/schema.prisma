@@ -11,7 +11,7 @@ model User {
   id          String    @id @default(cuid())
   name        String    @db.VarChar(100)
   profile_url String    @db.VarChar(1500)
-  social_id   String    @unique @db.VarChar(300)
+  social_id   String    @db.VarChar(300)
   created_at  DateTime  @default(now())
   updated_at  DateTime? @updatedAt
   deleted_at  DateTime?
@@ -24,6 +24,8 @@ model User {
   social_type    SocialLoginType @relation(fields: [social_type_id], references: [id])
   social_type_id Int
 
+
+  @@unique([social_id, social_type_id])
   @@map(name: "users")
 }
 

@@ -1,0 +1,11 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Token {
+  value: String!
+}
+
+type Query {
+  loginByGoogle(google_token: String!): Token
+}
