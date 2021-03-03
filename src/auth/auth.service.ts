@@ -48,4 +48,8 @@ export class AuthService {
     const payload: TokenPayload = { id: user.id };
     return this.jwtService.sign(payload);
   }
+
+  testerLogin(tester_id): string {
+    return this.jwtService.sign({ id: tester_id });
+  }
 }
