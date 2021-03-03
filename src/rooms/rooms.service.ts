@@ -1,0 +1,63 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
+import {
+  Room as RoomFromPrisma,
+  RoomStatus as RoomStatusFromPrisma,
+} from '@prisma/client';
+import { CreateRoomInput } from './dto/input/create-room.input';
+import { IUpdateRoomInput } from './dto/input/update-room.input';
+import { ROOM_STATUS_ID } from 'src/util/constans';
+
+@Injectable()
+export class RoomsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getRooms(): Promise<RoomFromPrisma[]> {
+    return this.prisma.room.findMany();
+  }
+
+  async getRoomStatus(room_status_id: number): Promise<RoomStatusFromPrisma> {
+    return this.prisma.roomStatus.findUnique({ where: { id: room_status_id } });
+  }
+
+  async createRoom(
+    createRoomData: CreateRoomInput,
+    inviter_id: string,
+  ): Promise<RoomFromPrisma> {
+    return this.prisma.room.create({
+      data: {
+        ...createRoomData,
+        location: createRoomData.location
+          ? JSON.stringify(createRoomData.location)
+          : null,
+        inviter_id,
+        room_status_id: ROOM_STATUS_ID.PROGRESS,
+      },
+    });
+  }
+
+  async getRoomById(room_id: string): Promise<RoomFromPrisma> {
+    return this.prisma.room.findUnique({ where: { id: room_id } });
+  }
+
+  async updateRoom(
+    room_id: string,
+    updateRoomData: IUpdateRoomInput,
+  ): Promise<RoomFromPrisma> {
+    const updatePayload: IUpdateRoomInput = Object.keys(updateRoomData).reduce(
+      (payload, field) => {
+        payload[field] =
+          field === 'location'
+            ? JSON.stringify(updateRoomData.location)
+            : updateRoomData[field];
+        return payload;
+      },
+      {},
+    );
+
+    return this.prisma.room.update({
+      where: { id: room_id },
+      data: updatePayload,
+    });
+  }
+}

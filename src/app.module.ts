@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { RoomsModule } from './rooms/rooms.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -10,6 +12,8 @@ import { AuthModule } from './auth/auth.module';
       playground: true,
     }),
     AuthModule,
+    RoomsModule,
+    UsersModule,
   ],
   providers: [],
 })

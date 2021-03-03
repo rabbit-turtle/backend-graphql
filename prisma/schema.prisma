@@ -10,7 +10,7 @@ generator client {
 model User {
   id          String    @id @default(cuid())
   name        String    @db.VarChar(100)
-  profile_url String    @db.VarChar(1500)
+  profile_url String?   @db.VarChar(1500)
   social_id   String    @db.VarChar(300)
   created_at  DateTime  @default(now())
   updated_at  DateTime? @updatedAt
@@ -81,8 +81,8 @@ model Room {
   room_status_id Int
   inviter        User       @relation("Room_inviterToUser", fields: [inviter_id], references: [id])
   inviter_id     String
-  receiver       User       @relation("Room_receiverToUser", fields: [receiver_id], references: [id])
-  receiver_id    String
+  receiver       User?      @relation("Room_receiverToUser", fields: [receiver_id], references: [id])
+  receiver_id    String?
 
   @@map(name: "rooms")
 }

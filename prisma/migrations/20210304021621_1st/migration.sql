@@ -2,13 +2,13 @@
 CREATE TABLE `users` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
-    `profile_url` VARCHAR(1500) NOT NULL,
+    `profile_url` VARCHAR(1500),
     `social_id` VARCHAR(300) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3),
     `deleted_at` DATETIME(3),
     `social_type_id` INTEGER NOT NULL,
-UNIQUE INDEX `users.social_id_unique`(`social_id`),
+UNIQUE INDEX `users.social_id_social_type_id_unique`(`social_id`, `social_type_id`),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
