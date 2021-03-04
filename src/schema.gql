@@ -21,6 +21,15 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Chat {
+  id: String!
+  content: String!
+  created_at: DateTime!
+  room_id: String!
+  isSender: Boolean!
+  sender: User!
+}
+
 type RoomStatus {
   id: Int!
   name: String!
@@ -44,6 +53,7 @@ type Query {
   loginByGoogle(google_token: String!): Token
   testerLogin(tester_id: String!): Token
   rooms: [Room]!
+  chats(room_id: String!): [Chat]!
 }
 
 type Mutation {
@@ -53,6 +63,7 @@ type Mutation {
   completeRoom(completeRoomData: CompleteRoomInput!): Room!
   cancleRoom(room_id: String!): Room!
   saveReceiver(room_id: String!): Room!
+  createChat(createChatData: CreateChatInput!): Chat!
 }
 
 input CreateRoomInput {
@@ -75,4 +86,9 @@ input CompleteRoomInput {
   room_id: String!
   completed_time: DateTime!
   location: String!
+}
+
+input CreateChatInput {
+  room_id: String!
+  content: String!
 }
