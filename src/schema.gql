@@ -52,6 +52,7 @@ type Room {
 type Query {
   loginByGoogle(google_token: String!): Token
   testerLogin(tester_id: String!): Token
+  authTest: String
   rooms: [Room]!
   chats(room_id: String!): [Chat]!
 }

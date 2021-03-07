@@ -1,7 +1,11 @@
+import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Args } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
+import { CurrentUser } from './decorator/CurrentUser';
 import { LoginByGoogleArgs } from './dto/input/login-by-google.input';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { Token } from './model/token';
+import { TokenPayload } from './model/TokenPayload';
 
 @Resolver()
 export class AuthResolver {
@@ -23,5 +27,13 @@ export class AuthResolver {
     return {
       value: this.authService.testerLogin(tester_id),
     };
+  }
+
+  @Query(() => String, { nullable: true })
+  @UseGuards(JwtAuthGuard)
+  authTest(@CurrentUser() currentUser: TokenPayload) {
+    const { id } = currentUser;
+    console.log('id from client!', id);
+    return `hello! ${id}`;
   }
 }
