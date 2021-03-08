@@ -16,6 +16,7 @@ import { CurrentUser } from 'src/auth/decorator/CurrentUser';
 import { TokenPayload } from 'src/auth/model/TokenPayload';
 import { User } from 'src/users/model/User';
 import { UsersService } from 'src/users/users.service';
+import { GetChatsArgs } from './dto/args/get-chats.args';
 
 @Resolver(() => Chat)
 export class ChatsResolver {
@@ -29,14 +30,10 @@ export class ChatsResolver {
   async getChats(
     @CurrentUser() currentUser: TokenPayload,
     @Args('room_id', { type: () => String }) room_id: string,
+    @Args() getChatsArgs: GetChatsArgs,
   ): Promise<Omit<Chat, 'sender'>[]> {
     const { id: user_id } = currentUser;
-    const chats = await this.chatsService.getChats(room_id);
-
-    return chats.map((chat) => ({
-      ...chat,
-      isSender: chat.sender_id === user_id,
-    }));
+    return this.chatsService.getChats(room_id, user_id, getChatsArgs);
   }
 
   @ResolveField('sender', () => User)

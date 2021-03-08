@@ -8,5 +8,6 @@ import { ChatsService } from './chats.service';
 @Module({
   imports: [AuthModule, UsersModule],
   providers: [PrismaService, ChatsService, ChatsResolver],
+  exports: [ChatsService],
 })
 export class ChatsModule {}
