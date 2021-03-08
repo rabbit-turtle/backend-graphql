@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Room as RoomFromPrisma } from '@prisma/client';
 import { RoomStatus } from './RoomStatus';
 import { User } from 'src/users/model/User';
+import { Chat } from 'src/chats/model/Chat';
 
 @ObjectType()
 export class Room
@@ -39,4 +40,7 @@ export class Room
 
   @Field({ nullable: true })
   location: string;
+
+  @Field(() => [Chat], { nullable: 'items' })
+  chats: Chat[];
 }

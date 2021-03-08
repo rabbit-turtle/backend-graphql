@@ -25,17 +25,47 @@ import { UpdateReservedTimeInput } from './dto/input/unpdate-reserved-time.input
 import { UpdateLocationInput } from './dto/input/update-location.input';
 import { CompleteRoomInput } from './dto/input/complete-room.input';
 import { ROOM_STATUS_ID } from 'src/util/constans';
+import { Chat } from 'src/chats/model/Chat';
+import { ChatsService } from 'src/chats/chats.service';
+import { GetChatsArgs } from 'src/chats/dto/args/get-chats.args';
+
+type RoomWithUserId = RoomFromPrisma & { user_id: string };
 
 @Resolver(() => Room)
 export class RoomsResolver {
   constructor(
     private readonly roomsService: RoomsService,
     private readonly usersService: UsersService,
+    private readonly chatsService: ChatsService,
   ) {}
 
   @Query(() => [Room], { name: 'rooms', nullable: 'items' })
-  async getRooms(): Promise<RoomFromPrisma[]> {
-    return this.roomsService.getRooms();
+  @UseGuards(JwtAuthGuard)
+  async getRooms(
+    @CurrentUser() currentUser: TokenPayload,
+  ): Promise<RoomWithUserId[]> {
+    const { id: user_id } = currentUser;
+    const rooms = await this.roomsService.getRooms(user_id);
+
+    return rooms.map((room) => ({
+      ...room,
+      user_id,
+    }));
+  }
+
+  @Query(() => Room, { name: 'room', nullable: true })
+  @UseGuards(JwtAuthGuard)
+  async getRoom(
+    @CurrentUser() currentUser: TokenPayload,
+    @Args('room_id', { type: () => String }) room_id: string,
+  ): Promise<RoomWithUserId> {
+    const { id: user_id } = currentUser;
+
+    const room = await this.roomsService.getRoomById(room_id);
+    return {
+      ...room,
+      user_id,
+    };
   }
 
   @ResolveField('roomStatus', () => RoomStatus)
@@ -53,6 +83,16 @@ export class RoomsResolver {
     const { receiver_id } = roomFromPrimsa;
     if (!receiver_id) return null;
     return this.usersService.getUser(receiver_id);
+  }
+
+  @ResolveField('chats', () => [Chat])
+  async getChats(
+    @Args() getChatsData: GetChatsArgs,
+    @Parent()
+    roomWithUserId: RoomWithUserId,
+  ): Promise<Omit<Chat, 'sender'>[]> {
+    const { id: room_id, user_id } = roomWithUserId;
+    return this.chatsService.getChats(room_id, user_id, getChatsData);
   }
 
   @ResolveField('inviter', () => User)

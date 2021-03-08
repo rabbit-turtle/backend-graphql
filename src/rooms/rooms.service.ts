@@ -12,8 +12,16 @@ import { ROOM_STATUS_ID } from 'src/util/constans';
 export class RoomsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getRooms(): Promise<RoomFromPrisma[]> {
-    return this.prisma.room.findMany();
+  async getRoomById(room_id: string): Promise<RoomFromPrisma> {
+    return this.prisma.room.findUnique({ where: { id: room_id } });
+  }
+
+  async getRooms(user_id: string): Promise<RoomFromPrisma[]> {
+    return this.prisma.room.findMany({
+      where: {
+        OR: [{ inviter_id: user_id }, { receiver_id: user_id }],
+      },
+    });
   }
 
   async getRoomStatus(room_status_id: number): Promise<RoomStatusFromPrisma> {
@@ -34,10 +42,6 @@ export class RoomsService {
         room_status_id: ROOM_STATUS_ID.PROGRESS,
       },
     });
-  }
-
-  async getRoomById(room_id: string): Promise<RoomFromPrisma> {
-    return this.prisma.room.findUnique({ where: { id: room_id } });
   }
 
   async updateRoom(

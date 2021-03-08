@@ -47,6 +47,7 @@ type Room {
   receiver: User
   inviter: User!
   location: String
+  chats(offset: Int, limit: Int): [Chat!]!
 }
 
 type Query {
@@ -54,7 +55,8 @@ type Query {
   testerLogin(tester_id: String!): Token
   authTest: String
   rooms: [Room]!
-  chats(room_id: String!): [Chat]!
+  room(room_id: String!): Room
+  chats(offset: Int, limit: Int, room_id: String!): [Chat]!
 }
 
 type Mutation {
@@ -92,4 +94,5 @@ input CompleteRoomInput {
 input CreateChatInput {
   room_id: String!
   content: String!
+  created_at: DateTime
 }

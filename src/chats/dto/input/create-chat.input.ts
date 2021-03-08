@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 @InputType()
 export class CreateChatInput {
@@ -10,4 +10,9 @@ export class CreateChatInput {
   @Field()
   @IsNotEmpty()
   content: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsNotEmpty()
+  created_at: Date;
 }
