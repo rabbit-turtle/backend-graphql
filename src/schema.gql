@@ -2,10 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Token {
-  value: String!
-}
-
 type User {
   id: String!
   name: String!
@@ -20,6 +16,17 @@ type User {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type UserWithToken {
+  id: String!
+  name: String!
+  profile_url: String
+  created_at: DateTime!
+  updated_at: DateTime
+  deleted_at: DateTime
+  social_type_id: Int!
+  token: String!
+}
 
 type Chat {
   id: String!
@@ -47,12 +54,12 @@ type Room {
   receiver: User
   inviter: User!
   location: String
+  recentChat: Chat!
   chats(offset: Int, limit: Int): [Chat!]!
 }
 
 type Query {
-  loginByGoogle(google_token: String!): Token
-  testerLogin(tester_id: String!): Token
+  loginByGoogle(google_token: String!): UserWithToken
   authTest: String
   rooms: [Room]!
   room(room_id: String!): Room

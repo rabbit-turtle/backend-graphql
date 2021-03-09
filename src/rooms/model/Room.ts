@@ -41,6 +41,9 @@ export class Room
   @Field({ nullable: true })
   location: string;
 
+  @Field(() => Chat, { nullable: true })
+  recentChat: Chat;
+
   @Field(() => [Chat], { nullable: 'items' })
   chats: Chat[];
 }

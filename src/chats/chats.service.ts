@@ -35,9 +35,11 @@ export class ChatsService {
       skip: offset,
     });
 
-    return chats.map((chat) => ({
-      ...chat,
-      isSender: chat.sender_id === user_id,
-    }));
+    return chats
+      .map((chat) => ({
+        ...chat,
+        isSender: chat.sender_id === user_id,
+      }))
+      .sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
   }
 }

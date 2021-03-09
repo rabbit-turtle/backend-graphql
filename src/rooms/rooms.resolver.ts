@@ -85,6 +85,19 @@ export class RoomsResolver {
     return this.usersService.getUser(receiver_id);
   }
 
+  @ResolveField('recentChat', () => Chat)
+  async getRecentChat(
+    @Parent() roomWithUserId: RoomWithUserId,
+  ): Promise<Omit<Chat, 'sender'>> {
+    const { id: room_id, user_id } = roomWithUserId;
+    const [recentChat] = await this.chatsService.getChats(room_id, user_id, {
+      offset: 0,
+      limit: 1,
+    });
+
+    return recentChat;
+  }
+
   @ResolveField('chats', () => [Chat])
   async getChats(
     @Args() getChatsData: GetChatsArgs,
