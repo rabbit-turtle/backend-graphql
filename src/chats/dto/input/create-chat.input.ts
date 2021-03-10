@@ -5,6 +5,10 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class CreateChatInput {
   @Field()
   @IsNotEmpty()
+  id: string;
+
+  @Field()
+  @IsNotEmpty()
   room_id: string;
 
   @Field()

@@ -85,7 +85,7 @@ export class RoomsResolver {
     return this.usersService.getUser(receiver_id);
   }
 
-  @ResolveField('recentChat', () => Chat)
+  @ResolveField('recentChat', () => Chat, { nullable: true })
   async getRecentChat(
     @Parent() roomWithUserId: RoomWithUserId,
   ): Promise<Omit<Chat, 'sender'>> {
