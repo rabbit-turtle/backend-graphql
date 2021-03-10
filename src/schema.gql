@@ -54,7 +54,7 @@ type Room {
   receiver: User
   inviter: User!
   location: String
-  recentChat: Chat!
+  recentChat: Chat
   chats(offset: Int, limit: Int): [Chat!]!
 }
 
@@ -99,6 +99,7 @@ input CompleteRoomInput {
 }
 
 input CreateChatInput {
+  id: String!
   room_id: String!
   content: String!
   created_at: DateTime

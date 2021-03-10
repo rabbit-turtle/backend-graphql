@@ -16,14 +16,14 @@ model User {
   updated_at  DateTime? @updatedAt
   deleted_at  DateTime?
 
-  chats          Chat[]
-  chat_imags     ChatImage[]
-  rooms_invited  Room[]      @relation("Room_inviterToUser")
-  rooms_received Room[]      @relation("Room_receiverToUser")
+  chats            Chat[]
+  chat_imags       ChatImage[]
+  last_viewed_chat LastViewedChat[]
+  rooms_invited    Room[]           @relation("Room_inviterToUser")
+  rooms_received   Room[]           @relation("Room_receiverToUser")
 
   social_type    SocialLoginType @relation(fields: [social_type_id], references: [id])
   social_type_id Int
-
 
   @@unique([social_id, social_type_id])
   @@map(name: "users")
@@ -43,12 +43,28 @@ model Chat {
   content    String   @db.VarChar(2000)
   created_at DateTime @default(now())
 
+  last_viewed_chat LastViewedChat[]
+
   sender    User   @relation(fields: [sender_id], references: [id])
   sender_id String
   room      Room   @relation(fields: [room_id], references: [id])
   room_id   String
 
   @@map(name: "chats")
+}
+
+model LastViewedChat {
+  id Int @id @default(autoincrement())
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+  room    Room   @relation(fields: [room_id], references: [id])
+  room_id String
+  chat    Chat   @relation(fields: [chat_id], references: [id])
+  chat_id String
+
+  @@unique([user_id, room_id])
+  @@map(name: "last_viewed_chats")
 }
 
 model ChatImage {
@@ -74,8 +90,9 @@ model Room {
   updated_at     DateTime? @updatedAt
   deleted_at     DateTime?
 
-  chats       Chat[]
-  chat_images ChatImage[]
+  chats            Chat[]
+  chat_images      ChatImage[]
+  last_viewed_chat LastViewedChat[]
 
   room_status    RoomStatus @relation(fields: [room_status_id], references: [id])
   room_status_id Int
