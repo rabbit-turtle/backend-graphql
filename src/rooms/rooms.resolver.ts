@@ -28,6 +28,7 @@ import { ROOM_STATUS_ID } from 'src/util/constans';
 import { Chat } from 'src/chats/model/Chat';
 import { ChatsService } from 'src/chats/chats.service';
 import { GetChatsArgs } from 'src/chats/dto/args/get-chats.args';
+import { Coords } from './model/Coords';
 
 type RoomWithUserId = RoomFromPrisma & { user_id: string };
 
@@ -96,6 +97,14 @@ export class RoomsResolver {
     });
 
     return recentChat;
+  }
+
+  @ResolveField('lastViewedChat', () => Chat, { nullable: true })
+  async getLastViewedChat(
+    @Parent() roomWithUserId: RoomWithUserId,
+  ): Promise<Omit<Chat, 'sender'>> {
+    const { id: room_id, user_id } = roomWithUserId;
+    return this.chatsService.getLastViewedChat(room_id, user_id);
   }
 
   @ResolveField('chats', () => [Chat])

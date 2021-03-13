@@ -21,6 +21,7 @@ export class RoomsService {
       where: {
         OR: [{ inviter_id: user_id }, { receiver_id: user_id }],
       },
+      orderBy: { created_at: 'desc' },
     });
   }
 
