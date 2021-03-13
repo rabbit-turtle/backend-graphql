@@ -17,6 +17,7 @@ import { TokenPayload } from 'src/auth/model/TokenPayload';
 import { User } from 'src/users/model/User';
 import { UsersService } from 'src/users/users.service';
 import { GetChatsArgs } from './dto/args/get-chats.args';
+import { SaveLastViewedChatInput } from './dto/input/save-last-viewed-chat.input';
 
 @Resolver(() => Chat)
 export class ChatsResolver {
@@ -49,8 +50,22 @@ export class ChatsResolver {
   async createChat(
     @CurrentUser() currentUser: TokenPayload,
     @Args('createChatData') createChatData: CreateChatInput,
-  ) {
+  ): Promise<Omit<Chat, 'sender'>> {
     const { id: sender_id } = currentUser;
     return this.chatsService.createChat(sender_id, createChatData);
+  }
+
+  @Mutation(() => Chat)
+  @UseGuards(JwtAuthGuard)
+  async saveLastViewedChat(
+    @CurrentUser() currentUser: TokenPayload,
+    @Args('saveLastViewedChatData')
+    saveLastViewedChatData: SaveLastViewedChatInput,
+  ): Promise<Omit<Chat, 'sender'>> {
+    const { id: user_id } = currentUser;
+    return this.chatsService.saveLastViewedChat(
+      user_id,
+      saveLastViewedChatData,
+    );
   }
 }

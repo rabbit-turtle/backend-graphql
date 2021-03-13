@@ -3,11 +3,15 @@ import { Room as RoomFromPrisma } from '@prisma/client';
 import { RoomStatus } from './RoomStatus';
 import { User } from 'src/users/model/User';
 import { Chat } from 'src/chats/model/Chat';
+import { Coords } from './Coords';
 
 @ObjectType()
 export class Room
   implements
-    Omit<RoomFromPrisma, 'room_status_id' | 'receiver_id' | 'inviter_id'> {
+    Omit<
+      RoomFromPrisma,
+      'room_status_id' | 'receiver_id' | 'inviter_id' | 'location'
+    > {
   @Field()
   id: string;
 
@@ -46,4 +50,7 @@ export class Room
 
   @Field(() => [Chat], { nullable: 'items' })
   chats: Chat[];
+
+  @Field(() => Chat, { nullable: true })
+  lastViewedChat: Chat;
 }
