@@ -1,5 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsNotEmpty, Contains } from 'class-validator';
+import { IsNotEmpty, IsObject } from 'class-validator';
+import { CoordsInput } from 'src/rooms/model/Room';
 
 @InputType()
 export class CompleteRoomInput {
@@ -11,9 +12,8 @@ export class CompleteRoomInput {
   @IsNotEmpty()
   completed_time: Date;
 
-  @Field()
+  @Field(() => CoordsInput)
+  @IsObject()
   @IsNotEmpty()
-  @Contains('longitude')
-  @Contains('latitude')
-  location: string;
+  location: CoordsInput;
 }

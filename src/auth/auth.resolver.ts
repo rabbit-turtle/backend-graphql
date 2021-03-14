@@ -30,4 +30,9 @@ export class AuthResolver {
     console.log('id from client!', id);
     return `hello! ${id}`;
   }
+
+  @Query(() => String, { nullable: true })
+  testerLogin(@Args('id') id: string) {
+    return this.authService.testerLogin(id);
+  }
 }

@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, InputType, Float } from '@nestjs/graphql';
 import { Room as RoomFromPrisma } from '@prisma/client';
 import { RoomStatus } from './RoomStatus';
 import { User } from 'src/users/model/User';
@@ -42,8 +42,8 @@ export class Room
   @Field(() => User)
   inviter: User;
 
-  @Field({ nullable: true })
-  location: string;
+  @Field(() => Coords, { nullable: true })
+  location: Coords;
 
   @Field(() => Chat, { nullable: true })
   recentChat: Chat;
@@ -53,4 +53,13 @@ export class Room
 
   @Field(() => Chat, { nullable: true })
   lastViewedChat: Chat;
+}
+
+@InputType()
+export class CoordsInput {
+  @Field(() => Float)
+  longitude: number;
+
+  @Field(() => Float)
+  latitude: number;
 }

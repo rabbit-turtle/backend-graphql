@@ -1,10 +1,11 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsNotEmpty, Contains, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsObject, IsOptional } from 'class-validator';
 import { Room as RoomFromPrisma } from '@prisma/client';
+import { CoordsInput } from 'src/rooms/model/Room';
 
 @InputType()
 export class CreateRoomInput
-  implements Pick<RoomFromPrisma, 'title' | 'reserved_time' | 'location'> {
+  implements Pick<RoomFromPrisma, 'title' | 'reserved_time'> {
   @Field()
   @IsNotEmpty()
   title: string;
@@ -14,10 +15,9 @@ export class CreateRoomInput
   @IsNotEmpty()
   reserved_time: Date;
 
-  @Field({ nullable: true })
-  @IsOptional()
+  @Field(() => CoordsInput, { nullable: true })
+  @IsObject()
   @IsNotEmpty()
-  @Contains('longitude')
-  @Contains('latitude')
-  location: string;
+  @IsOptional()
+  location: CoordsInput;
 }
