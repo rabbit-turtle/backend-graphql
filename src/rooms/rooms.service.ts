@@ -30,8 +30,8 @@ export class RoomsService {
   }
 
   async createRoom(
-    createRoomData: CreateRoomInput,
     inviter_id: string,
+    createRoomData: CreateRoomInput,
   ): Promise<RoomFromPrisma> {
     return this.prisma.room.create({
       data: {
@@ -49,20 +49,9 @@ export class RoomsService {
     room_id: string,
     updateRoomData: IUpdateRoomInput,
   ): Promise<RoomFromPrisma> {
-    const updatePayload: IUpdateRoomInput = Object.keys(updateRoomData).reduce(
-      (payload, field) => {
-        payload[field] =
-          field === 'location'
-            ? JSON.stringify(updateRoomData.location)
-            : updateRoomData[field];
-        return payload;
-      },
-      {},
-    );
-
     return this.prisma.room.update({
       where: { id: room_id },
-      data: updatePayload,
+      data: updateRoomData,
     });
   }
 }

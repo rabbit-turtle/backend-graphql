@@ -69,6 +69,12 @@ export class RoomsResolver {
     };
   }
 
+  @ResolveField('location', () => Coords, { nullable: true })
+  location(@Parent() roomFromPrisma: RoomFromPrisma): Coords {
+    const { location } = roomFromPrisma;
+    return JSON.parse(location as string) as Coords;
+  }
+
   @ResolveField('roomStatus', () => RoomStatus)
   async getRoomStatus(
     @Parent() roomFromPrisma: RoomFromPrisma,
@@ -110,8 +116,7 @@ export class RoomsResolver {
   @ResolveField('chats', () => [Chat])
   async getChats(
     @Args() getChatsData: GetChatsArgs,
-    @Parent()
-    roomWithUserId: RoomWithUserId,
+    @Parent() roomWithUserId: RoomWithUserId,
   ): Promise<Omit<Chat, 'sender'>[]> {
     const { id: room_id, user_id } = roomWithUserId;
     return this.chatsService.getChats(room_id, user_id, getChatsData);
@@ -132,7 +137,7 @@ export class RoomsResolver {
     @Args('createRoomData') createRoomData: CreateRoomInput,
   ): Promise<RoomFromPrisma> {
     const { id: inviter_id } = currentUser;
-    return this.roomsService.createRoom(createRoomData, inviter_id);
+    return this.roomsService.createRoom(inviter_id, createRoomData);
   }
 
   @Mutation(() => Room)
@@ -166,7 +171,9 @@ export class RoomsResolver {
     const isInviterSame = foundRoom.inviter_id === inviter_id;
     if (!isInviterSame) throw new ForbiddenException();
 
-    return this.roomsService.updateRoom(room_id, { location });
+    return this.roomsService.updateRoom(room_id, {
+      location: JSON.stringify(location),
+    });
   }
 
   @Mutation(() => Room)
@@ -184,7 +191,7 @@ export class RoomsResolver {
     if (!isInviterSame) throw new ForbiddenException();
 
     return this.roomsService.updateRoom(room_id, {
-      location,
+      location: JSON.stringify(location),
       completed_time,
       room_status_id: ROOM_STATUS_ID.DONE,
     });

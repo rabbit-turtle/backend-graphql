@@ -42,6 +42,11 @@ type RoomStatus {
   name: String!
 }
 
+type Coords {
+  longitude: Float!
+  latitude: Float!
+}
+
 type Room {
   id: String!
   title: String!
@@ -53,7 +58,7 @@ type Room {
   roomStatus: RoomStatus!
   receiver: User
   inviter: User!
-  location: String
+  location: Coords
   recentChat: Chat
   chats(offset: Int, limit: Int): [Chat!]!
   lastViewedChat: Chat
@@ -62,6 +67,7 @@ type Room {
 type Query {
   loginByGoogle(google_token: String!): UserWithToken
   authTest: String
+  testerLogin(id: String!): String
   rooms: [Room]!
   room(room_id: String!): Room
   chats(offset: Int, limit: Int, room_id: String!): [Chat]!
@@ -81,7 +87,12 @@ type Mutation {
 input CreateRoomInput {
   title: String!
   reserved_time: DateTime
-  location: String
+  location: CoordsInput
+}
+
+input CoordsInput {
+  longitude: Float!
+  latitude: Float!
 }
 
 input UpdateReservedTimeInput {
@@ -91,13 +102,13 @@ input UpdateReservedTimeInput {
 
 input UpdateLocationInput {
   room_id: String!
-  location: String!
+  location: CoordsInput!
 }
 
 input CompleteRoomInput {
   room_id: String!
   completed_time: DateTime!
-  location: String!
+  location: CoordsInput!
 }
 
 input CreateChatInput {
