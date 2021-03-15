@@ -1,6 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsNotEmpty, IsObject } from 'class-validator';
-import { CoordsInput } from 'src/rooms/model/Room';
+import { CoordsInput } from 'src/rooms/model/Coords';
 
 @InputType()
 export class CompleteRoomInput {
