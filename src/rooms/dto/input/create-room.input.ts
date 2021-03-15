@@ -1,7 +1,7 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsNotEmpty, IsObject, IsOptional } from 'class-validator';
 import { Room as RoomFromPrisma } from '@prisma/client';
-import { CoordsInput } from 'src/rooms/model/Room';
+import { CoordsInput } from 'src/rooms/model/Coords';
 
 @InputType()
 export class CreateRoomInput
