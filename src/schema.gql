@@ -25,7 +25,8 @@ type UserWithToken {
   updated_at: DateTime
   deleted_at: DateTime
   social_type_id: Int!
-  token: String!
+  access_token: String!
+  expires_in: Int!
 }
 
 type Chat {
@@ -66,14 +67,14 @@ type Room {
 
 type Query {
   loginByGoogle(google_token: String!): UserWithToken
-  authTest: String
-  testerLogin(id: String!): String
+  refreshToken: UserWithToken
   rooms: [Room]!
   room(room_id: String!): Room
   chats(offset: Int, limit: Int, room_id: String!): [Chat]!
 }
 
 type Mutation {
+  logoutFromAllDevices: String!
   createRoom(createRoomData: CreateRoomInput!): Room!
   updateReservedTime(updateReservedTimeData: UpdateReservedTimeInput!): Room!
   updateLocation(updateLocationData: UpdateLocationInput!): Room!
