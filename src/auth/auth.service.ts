@@ -5,12 +5,14 @@ import { PrismaService } from 'src/prisma.service';
 import { TokenPayload } from './model/TokenPayload';
 import { OAuth2Client } from 'google-auth-library';
 import { SOCIAL_TYPE_ID } from '../util/constans';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
   ) {}
 
   async verifyByGoogle(googleToken: string): Promise<User> {
@@ -44,12 +46,50 @@ export class AuthService {
     });
   }
 
-  login(user: User): string {
-    const payload: TokenPayload = { id: user.id };
-    return this.jwtService.sign(payload);
+  async login(
+    user_id: string,
+  ): Promise<{
+    access_token: string;
+    expires_in: number;
+    refresh_token: string;
+  }> {
+    const payload: TokenPayload = { id: user_id };
+    const access_token = this.jwtService.sign(payload);
+
+    let refresh_token = await this.redis.get(user_id);
+    if (!refresh_token) {
+      refresh_token = this.jwtService.sign(payload, {
+        secret: process.env.REFRESH_TOKEN_SALT,
+      });
+      await this.redis.set(user_id, refresh_token);
+    }
+
+    return {
+      access_token,
+      expires_in: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
+      refresh_token,
+    };
   }
 
-  testerLogin(tester_id): string {
-    return this.jwtService.sign({ id: tester_id });
+  async refresh(
+    user_id: string,
+  ): Promise<{
+    access_token: string;
+    expires_in: number;
+    refresh_token: string;
+  }> {
+    const payload: TokenPayload = { id: user_id };
+    const access_token = this.jwtService.sign(payload);
+
+    const refresh_token = this.jwtService.sign(payload, {
+      secret: process.env.REFRESH_TOKEN_SALT,
+    });
+    await this.redis.set(user_id, refresh_token);
+
+    return {
+      access_token,
+      expires_in: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
+      refresh_token,
+    };
   }
 }

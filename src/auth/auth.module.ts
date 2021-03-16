@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { PrismaService } from 'src/prisma.service';
+import { RedisModule } from 'src/redis/redis.module';
+import { UsersModule } from 'src/users/users.module';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategy/jwt.strategy';
@@ -11,9 +13,12 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.TOKEN_SALT,
+      secret: process.env.ACCESS_TOKEN_SALT,
+      signOptions: { expiresIn: `${process.env.ACCESS_TOKEN_EXPIRES_IN}s` },
     }),
     PassportModule,
+    RedisModule,
+    UsersModule,
   ],
   // controllers: [AuthController],
   providers: [
