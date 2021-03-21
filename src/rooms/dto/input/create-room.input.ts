@@ -1,11 +1,9 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsNotEmpty, IsObject, IsOptional } from 'class-validator';
-import { Room as RoomFromPrisma } from '@prisma/client';
 import { CoordsInput } from 'src/rooms/model/Coords';
 
 @InputType()
-export class CreateRoomInput
-  implements Pick<RoomFromPrisma, 'title' | 'reserved_time'> {
+export class CreateRoomInput {
   @Field()
   @IsNotEmpty()
   title: string;

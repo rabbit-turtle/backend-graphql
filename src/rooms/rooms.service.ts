@@ -5,7 +5,7 @@ import {
   RoomStatus as RoomStatusFromPrisma,
 } from '@prisma/client';
 import { CreateRoomInput } from './dto/input/create-room.input';
-import { IUpdateRoomInput } from './dto/input/update-room.input';
+import { IServiceUpdateRoomInput } from './dto/input/update-room.input';
 import { ROOM_STATUS_ID } from 'src/util/constans';
 
 @Injectable()
@@ -47,11 +47,18 @@ export class RoomsService {
 
   async updateRoom(
     room_id: string,
-    updateRoomData: IUpdateRoomInput,
+    updateRoomData: IServiceUpdateRoomInput,
   ): Promise<RoomFromPrisma> {
+    const data = Object.assign(
+      updateRoomData,
+      updateRoomData.location && {
+        location: JSON.stringify(updateRoomData.location),
+      },
+    );
+
     return this.prisma.room.update({
       where: { id: room_id },
-      data: updateRoomData,
+      data,
     });
   }
 }

@@ -76,8 +76,7 @@ type Query {
 type Mutation {
   logoutFromAllDevices: String!
   createRoom(createRoomData: CreateRoomInput!): Room!
-  updateReservedTime(updateReservedTimeData: UpdateReservedTimeInput!): Room!
-  updateLocation(updateLocationData: UpdateLocationInput!): Room!
+  updateRoom(updateRoomData: UpdateRoomInput!): Room!
   completeRoom(completeRoomData: CompleteRoomInput!): Room!
   cancleRoom(room_id: String!): Room!
   saveReceiver(room_id: String!): Room!
@@ -96,14 +95,10 @@ input CoordsInput {
   latitude: Float!
 }
 
-input UpdateReservedTimeInput {
+input UpdateRoomInput {
   room_id: String!
-  reserved_time: DateTime!
-}
-
-input UpdateLocationInput {
-  room_id: String!
-  location: CoordsInput!
+  reserved_time: DateTime
+  location: CoordsInput
 }
 
 input CompleteRoomInput {
