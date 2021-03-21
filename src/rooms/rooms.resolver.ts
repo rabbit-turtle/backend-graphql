@@ -21,14 +21,13 @@ import { CurrentUser } from 'src/auth/decorator/CurrentUser';
 import { TokenPayload } from 'src/auth/model/TokenPayload';
 import { CreateRoomInput } from './dto/input/create-room.input';
 import { UsersService } from 'src/users/users.service';
-import { UpdateReservedTimeInput } from './dto/input/unpdate-reserved-time.input';
-import { UpdateLocationInput } from './dto/input/update-location.input';
 import { CompleteRoomInput } from './dto/input/complete-room.input';
 import { ROOM_STATUS_ID } from 'src/util/constans';
 import { Chat } from 'src/chats/model/Chat';
 import { ChatsService } from 'src/chats/chats.service';
 import { GetChatsArgs } from 'src/chats/dto/args/get-chats.args';
 import { Coords } from './model/Coords';
+import { UpdateRoomInput } from './dto/input/update-room.input';
 
 type RoomWithUserId = RoomFromPrisma & { user_id: string };
 
@@ -142,37 +141,21 @@ export class RoomsResolver {
 
   @Mutation(() => Room)
   @UseGuards(JwtAuthGuard)
-  async updateReservedTime(
+  async updateRoom(
     @CurrentUser() currentUser: TokenPayload,
-    @Args('updateReservedTimeData')
-    updateReservedTimeData: UpdateReservedTimeInput,
+    @Args('updateRoomData')
+    updateRoomData: UpdateRoomInput,
   ): Promise<RoomFromPrisma> {
     const { id: inviter_id } = currentUser;
-    const { room_id, reserved_time } = updateReservedTimeData;
-
-    const foundRoom = await this.roomsService.getRoomById(room_id);
-    const isInviterSame = foundRoom.inviter_id === inviter_id;
-    if (!isInviterSame) throw new ForbiddenException();
-
-    return this.roomsService.updateRoom(room_id, { reserved_time });
-  }
-
-  @Mutation(() => Room)
-  @UseGuards(JwtAuthGuard)
-  async updateLocation(
-    @CurrentUser() currentUser: TokenPayload,
-    @Args('updateLocationData')
-    updateLocationData: UpdateLocationInput,
-  ): Promise<RoomFromPrisma> {
-    const { id: inviter_id } = currentUser;
-    const { room_id, location } = updateLocationData;
+    const { room_id, reserved_time, location } = updateRoomData;
 
     const foundRoom = await this.roomsService.getRoomById(room_id);
     const isInviterSame = foundRoom.inviter_id === inviter_id;
     if (!isInviterSame) throw new ForbiddenException();
 
     return this.roomsService.updateRoom(room_id, {
-      location: JSON.stringify(location),
+      reserved_time,
+      location,
     });
   }
 
@@ -191,7 +174,7 @@ export class RoomsResolver {
     if (!isInviterSame) throw new ForbiddenException();
 
     return this.roomsService.updateRoom(room_id, {
-      location: JSON.stringify(location),
+      location,
       completed_time,
       room_status_id: ROOM_STATUS_ID.DONE,
     });
