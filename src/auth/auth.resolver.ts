@@ -34,7 +34,11 @@ export class AuthResolver {
       refresh_token,
     } = await this.authService.login(user.id);
 
-    context.res.cookie('refresh_token', refresh_token);
+    context.res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
 
     return {
       ...user,
@@ -55,6 +59,7 @@ export class AuthResolver {
     if (!refreshTokenFromRedis) throw new UnauthorizedException();
 
     const { refresh_token: refreshTokenFromCookie } = context.req.cookies;
+    console.log('cookies in refresh_token:: ', context.req.cookies);
     if (!refreshTokenFromCookie) throw new UnauthorizedException();
 
     if (refreshTokenFromRedis !== refreshTokenFromCookie)
@@ -67,7 +72,11 @@ export class AuthResolver {
       refresh_token,
     } = await this.authService.refresh(user.id);
 
-    context.res.cookie('refresh_token', refresh_token);
+    context.res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
 
     return {
       ...user,
