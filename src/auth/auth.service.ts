@@ -92,4 +92,12 @@ export class AuthService {
       refresh_token,
     };
   }
+
+  verifyRefreshToken(refresh_token: string) {
+    const { id }: TokenPayload = this.jwtService.verify(refresh_token, {
+      secret: process.env.REFRESH_TOKEN_SALT,
+    });
+
+    return id;
+  }
 }
