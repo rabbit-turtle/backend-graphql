@@ -50,14 +50,14 @@ export class AuthResolver {
   @Query(() => UserWithToken, { nullable: true })
   async refreshToken(@Context() context: CustomGraphQlContext) {
     const { refresh_token: refreshTokenFromCookie } = context.req.cookies;
+    if (!refreshTokenFromCookie) throw new UnauthorizedException();
+
     const userIdFromRefreshToken = this.authService.verifyRefreshToken(
       refreshTokenFromCookie,
     );
 
     const refreshTokenFromRedis = await this.redis.get(userIdFromRefreshToken);
     if (!refreshTokenFromRedis) throw new UnauthorizedException();
-
-    if (!refreshTokenFromCookie) throw new UnauthorizedException();
 
     if (refreshTokenFromRedis !== refreshTokenFromCookie)
       throw new ForbiddenException();
