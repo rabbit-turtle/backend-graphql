@@ -13,6 +13,7 @@ import { RedisService } from 'src/redis/redis.service';
 import { CurrentUser } from './decorator/CurrentUser';
 import { TokenPayload } from './model/TokenPayload';
 import { UsersService } from 'src/users/users.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Resolver()
 export class AuthResolver {
@@ -20,6 +21,7 @@ export class AuthResolver {
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly redis: RedisService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Query(() => UserWithToken, { nullable: true })
@@ -92,5 +94,10 @@ export class AuthResolver {
     await this.redis.del(id);
 
     return 'logout succeed';
+  }
+
+  @Query(() => String)
+  testerLogin(@Args('id') id: string): string {
+    return this.jwtService.sign({ id });
   }
 }

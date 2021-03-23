@@ -1,4 +1,3 @@
-import { from } from 'rxjs';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { User as UserFromPrisma } from '@prisma/client';
 

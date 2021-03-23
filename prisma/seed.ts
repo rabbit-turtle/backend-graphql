@@ -3,12 +3,14 @@ import {
   RoomStatus,
   SocialLoginType,
   User,
+  ChatType,
 } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 type RoomStatusName = Omit<RoomStatus, 'id'>;
 type SocialLoginTypeName = Omit<SocialLoginType, 'id'>;
+type ChatTypeName = Omit<ChatType, 'id'>;
 type Tester = Pick<User, 'name' | 'social_id' | 'social_type_id'>;
 
 const ROOM_STATUS_NAMES: RoomStatusName[] = [
@@ -21,6 +23,13 @@ const ROOM_STATUS_NAMES: RoomStatusName[] = [
 const SOCIAL_LOGIN_TYPE_NAMES: SocialLoginTypeName[] = [
   { name: 'GOOGLE' },
   { name: 'KAKAO' },
+];
+
+const CHAT_TYPES_NAMES: ChatTypeName[] = [
+  { name: 'NORMAL' },
+  { name: 'SUGGESTION' },
+  { name: 'SUGGESTION_CONFIRMED' },
+  { name: 'SUGGESTION_REFUSED' },
 ];
 
 const TESTERS: Tester[] = [
@@ -37,12 +46,17 @@ const main = async () => {
     prisma.socialLoginType.create({ data: { name } }),
   );
 
+  const createChatType = CHAT_TYPES_NAMES.map(({ name }) =>
+    prisma.chatType.create({ data: { name } }),
+  );
+
   const createTesters = TESTERS.map((tester) =>
     prisma.user.create({ data: tester }),
   );
 
   await prisma.$transaction(createRoomStatus);
   await prisma.$transaction(createSocialLoginType);
+  await prisma.$transaction(createChatType);
   await prisma.$transaction(createTesters);
 };
 

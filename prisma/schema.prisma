@@ -51,7 +51,19 @@ model Chat {
   room      Room   @relation(fields: [room_id], references: [id])
   room_id   String
 
+  chat_type ChatType @relation(fields: [chat_type_id], references: [id])
+  chat_type_id Int
+
   @@map(name: "chats")
+}
+
+model ChatType {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(50)
+
+  chats Chat[]
+
+  @@map(name: "chat_types")
 }
 
 model LastViewedChat {

@@ -36,6 +36,14 @@ type Chat {
   room_id: String!
   isSender: Boolean!
   sender: User!
+  chat_type_id: AllowedChatType!
+}
+
+enum AllowedChatType {
+  NORMAL
+  SUGGESTION
+  SUGGESTION_CONFIRMED
+  SUGGESTION_REFUSED
 }
 
 type RoomStatus {
@@ -68,6 +76,7 @@ type Room {
 type Query {
   loginByGoogle(google_token: String!): UserWithToken
   refreshToken: UserWithToken
+  testerLogin(id: String!): String!
   rooms: [Room]!
   room(room_id: String!): Room
   chats(offset: Int, limit: Int, room_id: String!): [Chat]!
@@ -112,6 +121,7 @@ input CreateChatInput {
   room_id: String!
   content: String!
   created_at: DateTime
+  chat_type_id: AllowedChatType!
 }
 
 input SaveLastViewedChatInput {
