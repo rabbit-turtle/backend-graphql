@@ -13,7 +13,6 @@ import { RedisService } from 'src/redis/redis.service';
 import { CurrentUser } from './decorator/CurrentUser';
 import { TokenPayload } from './model/TokenPayload';
 import { UsersService } from 'src/users/users.service';
-import { JwtService } from '@nestjs/jwt';
 
 @Resolver()
 export class AuthResolver {
@@ -21,7 +20,6 @@ export class AuthResolver {
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly redis: RedisService,
-    private readonly jwtService: JwtService,
   ) {}
 
   @Query(() => UserWithToken, { nullable: true })
@@ -50,24 +48,21 @@ export class AuthResolver {
   }
 
   @Query(() => UserWithToken, { nullable: true })
-  @UseGuards(JwtAuthGuard)
-  async refreshToken(
-    @CurrentUser() currentUser: TokenPayload,
-    @Context() context: CustomGraphQlContext,
-  ) {
-    const { id: userIdFromAccessToken } = currentUser;
+  async refreshToken(@Context() context: CustomGraphQlContext) {
+    const { refresh_token: refreshTokenFromCookie } = context.req.cookies;
+    const userIdFromRefreshToken = this.authService.verifyRefreshToken(
+      refreshTokenFromCookie,
+    );
 
-    const refreshTokenFromRedis = await this.redis.get(userIdFromAccessToken);
+    const refreshTokenFromRedis = await this.redis.get(userIdFromRefreshToken);
     if (!refreshTokenFromRedis) throw new UnauthorizedException();
 
-    const { refresh_token: refreshTokenFromCookie } = context.req.cookies;
-    console.log('cookies in refresh_token:: ', context.req.cookies);
     if (!refreshTokenFromCookie) throw new UnauthorizedException();
 
     if (refreshTokenFromRedis !== refreshTokenFromCookie)
       throw new ForbiddenException();
 
-    const user = await this.usersService.getUser(userIdFromAccessToken);
+    const user = await this.usersService.getUser(userIdFromRefreshToken);
     const {
       access_token,
       expires_in,
@@ -96,8 +91,8 @@ export class AuthResolver {
     return 'logout succeed';
   }
 
-  @Query(() => String)
-  testerLogin(@Args('id') id: string): string {
-    return this.jwtService.sign({ id });
-  }
+  // @Query(() => String)
+  // testerLogin(@Args('id') id: string): string {
+  //   return this.jwtService.sign({ id });
+  // }
 }
