@@ -7,6 +7,7 @@ import { RoomsModule } from './rooms/rooms.module';
 import { UsersModule } from './users/users.module';
 import { Request, Response } from 'express';
 import { RedisModule } from './redis/redis.module';
+import { CommonModule } from './common/common.module';
 
 export type CustomGraphQlContext = {
   req: Request;
@@ -31,6 +32,7 @@ export type CustomGraphQlContext = {
     RoomsModule,
     UsersModule,
     ChatsModule,
+    CommonModule,
   ],
   providers: [],
 })
