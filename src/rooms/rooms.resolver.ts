@@ -15,7 +15,11 @@ import {
   Room as RoomFromPrisma,
   RoomStatus as RoomStatusFromPrisma,
 } from '@prisma/client';
-import { ForbiddenException, UseGuards } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorator/CurrentUser';
 import { TokenPayload } from 'src/auth/model/TokenPayload';
@@ -146,12 +150,15 @@ export class RoomsResolver {
     @Args('updateRoomData')
     updateRoomData: UpdateRoomInput,
   ): Promise<RoomFromPrisma> {
-    const { id: inviter_id } = currentUser;
+    const { id: user_id } = currentUser;
     const { room_id, reserved_time, location } = updateRoomData;
 
-    const foundRoom = await this.roomsService.getRoomById(room_id);
-    const isInviterSame = foundRoom.inviter_id === inviter_id;
-    if (!isInviterSame) throw new ForbiddenException();
+    const { receiver_id, inviter_id } = await this.roomsService.getRoomById(
+      room_id,
+    );
+
+    const isUserAuthorized = receiver_id === user_id || inviter_id === user_id;
+    if (!isUserAuthorized) throw new ForbiddenException();
 
     return this.roomsService.updateRoom(room_id, {
       reserved_time,
@@ -166,12 +173,15 @@ export class RoomsResolver {
     @Args('completeRoomData')
     completeRoomData: CompleteRoomInput,
   ): Promise<RoomFromPrisma> {
-    const { id: inviter_id } = currentUser;
+    const { id: user_id } = currentUser;
     const { room_id, location, completed_time } = completeRoomData;
 
-    const foundRoom = await this.roomsService.getRoomById(room_id);
-    const isInviterSame = foundRoom.inviter_id === inviter_id;
-    if (!isInviterSame) throw new ForbiddenException();
+    const { receiver_id, inviter_id } = await this.roomsService.getRoomById(
+      room_id,
+    );
+
+    const isUserAuthorized = receiver_id === user_id || inviter_id === user_id;
+    if (!isUserAuthorized) throw new ForbiddenException();
 
     return this.roomsService.updateRoom(room_id, {
       location,
@@ -186,11 +196,14 @@ export class RoomsResolver {
     @CurrentUser() currentUser: TokenPayload,
     @Args('room_id', { type: () => String }) room_id: string,
   ): Promise<RoomFromPrisma> {
-    const { id: inviter_id } = currentUser;
+    const { id: user_id } = currentUser;
 
-    const foundRoom = await this.roomsService.getRoomById(room_id);
-    const isInviterSame = foundRoom.inviter_id === inviter_id;
-    if (!isInviterSame) throw new ForbiddenException();
+    const { receiver_id, inviter_id } = await this.roomsService.getRoomById(
+      room_id,
+    );
+
+    const isUserAuthorized = receiver_id === user_id || inviter_id === user_id;
+    if (!isUserAuthorized) throw new ForbiddenException();
 
     return this.roomsService.updateRoom(room_id, {
       room_status_id: ROOM_STATUS_ID.CANCELLED,
@@ -204,6 +217,11 @@ export class RoomsResolver {
     @Args('room_id', { type: () => String }) room_id: string,
   ): Promise<RoomFromPrisma> {
     const { id: receiver_id } = currentUser;
+
+    const foundRoom = await this.roomsService.getRoomById(room_id);
+    if (foundRoom.inviter_id === receiver_id) throw new ConflictException();
+    if (foundRoom.receiver_id) throw new ForbiddenException();
+
     return this.roomsService.updateRoom(room_id, { receiver_id });
   }
 }
