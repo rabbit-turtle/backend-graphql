@@ -82,10 +82,6 @@ export class AuthService {
     const payload: TokenPayload = { id: user_id };
     const access_token = this.jwtService.sign(payload);
 
-    // const refresh_token = this.jwtService.sign(payload, {
-    //   secret: process.env.REFRESH_TOKEN_SALT,
-    //   expiresIn: '365d',
-    // });
     const refresh_token = jwt.sign(payload, process.env.REFRESH_TOKEN_SALT);
     await this.redis.set(user_id, refresh_token);
 
