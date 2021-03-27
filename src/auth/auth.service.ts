@@ -6,6 +6,7 @@ import { TokenPayload } from './model/TokenPayload';
 import { OAuth2Client } from 'google-auth-library';
 import { SOCIAL_TYPE_ID } from '../util/constans';
 import { RedisService } from 'src/redis/redis.service';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -81,10 +82,11 @@ export class AuthService {
     const payload: TokenPayload = { id: user_id };
     const access_token = this.jwtService.sign(payload);
 
-    const refresh_token = this.jwtService.sign(payload, {
-      secret: process.env.REFRESH_TOKEN_SALT,
-      expiresIn: '365d',
-    });
+    // const refresh_token = this.jwtService.sign(payload, {
+    //   secret: process.env.REFRESH_TOKEN_SALT,
+    //   expiresIn: '365d',
+    // });
+    const refresh_token = jwt.sign(payload, process.env.REFRESH_TOKEN_SALT);
     await this.redis.set(user_id, refresh_token);
 
     return {
@@ -95,9 +97,10 @@ export class AuthService {
   }
 
   verifyRefreshToken(refresh_token: string) {
-    const { id }: TokenPayload = this.jwtService.verify(refresh_token, {
-      secret: process.env.REFRESH_TOKEN_SALT,
-    });
+    const { id } = jwt.verify(
+      refresh_token,
+      process.env.REFRESH_TOKEN_SALT,
+    ) as TokenPayload;
 
     return id;
   }
