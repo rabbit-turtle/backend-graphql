@@ -66,6 +66,11 @@ export class RoomsResolver {
     const { id: user_id } = currentUser;
 
     const room = await this.roomsService.getRoomById(room_id);
+
+    const isUserAuthorized =
+      room.receiver_id === user_id || room.inviter_id === user_id;
+    if (!isUserAuthorized) throw new ForbiddenException();
+
     return {
       ...room,
       user_id,
