@@ -59,9 +59,7 @@ export class AuthService {
 
     let refresh_token = await this.redis.get(user_id);
     if (!refresh_token) {
-      refresh_token = this.jwtService.sign(payload, {
-        secret: process.env.REFRESH_TOKEN_SALT,
-      });
+      refresh_token = jwt.sign(payload, process.env.REFRESH_TOKEN_SALT);
       await this.redis.set(user_id, refresh_token);
     }
 

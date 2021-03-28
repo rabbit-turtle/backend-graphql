@@ -10,7 +10,6 @@ export class DateScalar implements CustomScalar<Date, Date> {
   }
 
   serialize(value: Date): Date {
-    value.setHours(value.getHours() + 9);
     return value;
   }
 
