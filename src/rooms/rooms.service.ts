@@ -17,12 +17,19 @@ export class RoomsService {
   }
 
   async getRooms(user_id: string): Promise<RoomFromPrisma[]> {
-    return this.prisma.room.findMany({
-      where: {
-        OR: [{ inviter_id: user_id }, { receiver_id: user_id }],
-      },
-      orderBy: { created_at: 'desc' },
-    });
+    return await this.prisma.$queryRaw<RoomFromPrisma[]>`
+      SELECT *
+      FROM rooms
+      WHERE rooms.inviter_id=${user_id} or rooms.receiver_id=${user_id}
+      ORDER BY 
+        (
+          SELECT created_at FROM chats
+          WHERE chats.room_id = rooms.id 
+          ORDER BY created_at DESC
+          LIMIT 1
+        ) DESC,
+        rooms.created_at DESC;
+    `;
   }
 
   async getRoomStatus(room_status_id: number): Promise<RoomStatusFromPrisma> {
