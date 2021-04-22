@@ -25,14 +25,13 @@
 # GraphQL Server (AWS Lambda)
 
 - 앱의 HTTP 통신을 담당하는 GraphQL Server
-- 실행 환경: AWS Lambda
+- 실행 환경: AWS EC2
 
 ## Techinical Stacks
 
-- AWS API Gateway (HTTP API)
-- AWS Lambda
+- Amazon EC2
 - Amazon RDS (MySQL)
+- Redis
 - [Prisma: Next-gen ORM](https://www.prisma.io/)
 - Nest.js
 - TypeScript
-- Serverless Framework
