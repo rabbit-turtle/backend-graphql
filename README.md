@@ -35,3 +35,6 @@
 - [Prisma: Next-gen ORM](https://www.prisma.io/)
 - Nest.js
 - TypeScript
+
+## 추구 개선사항
+- Docker Image
